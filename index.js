@@ -62,7 +62,10 @@ var ignored_commandtypes = [
     'rpl_motdstart',
     'rpl_motd',
     'rpl_endofmotd',
-    'rpl_creationtime'
+    'rpl_creationtime',
+    'rpl_welcome',
+    'rpl_yourhost',
+    'rpl_myinfo'
 ];
 client.addListener('raw', function (m) {
     var s = ''; // string we'll build & print to console
