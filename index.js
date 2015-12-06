@@ -45,10 +45,14 @@ var client = new irc('chat.freenode.net', set.username, {
 });
 
 client.addListener('error', err);
-client.addListener('notice', function (nick, to, text, message) {
-    if ((message.prefix === "NickServ!NickServ@services.")
-        && (to === set.username)
-        && (text === "You are now identified for " + set.username + ".")) {
+client.addListener('raw', function (message) {
+    var fserver = /[a-z0-9]+\.freenode\.net$/i;
+    if (message.prefix.match(fserver)
+        && message.server.match(fserver)
+        && (message.commandType === 'normal')
+        && (message.args[0] === set.username)
+        && message.args[1].match(/^unaffiliated\//)
+        && (message.args[2] === 'is now your hidden host (set by services.)')) {
         client.join(set.channels);
     }
 });
