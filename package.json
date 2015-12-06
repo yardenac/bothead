@@ -8,6 +8,7 @@
         "url": "https://github.com/yardenac/bothead.git"
     },
     "dependencies": {
-        "irc": "^0.4.0"
+        "irc": "^0.4.0",
+        "minimist": "^1.2.0"
     }
 }

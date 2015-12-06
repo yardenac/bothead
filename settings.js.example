@@ -1,0 +1,5 @@
+module.exports = {
+    username: 'user',
+    password: 'password',
+    channels: '#channel'
+};
