@@ -47,7 +47,7 @@ var client = new irc('chat.freenode.net', set.username, {
 client.addListener('error', err);
 client.addListener('raw', function (message) {
     var fserver = /[a-z0-9]+\.freenode\.net$/i;
-    if (message.prefix.match(fserver)
+    if (message.prefix && message.prefix.match(fserver)
         && message.server.match(fserver)
         && (message.commandType === 'normal')
         && (message.args[0] === set.username)
