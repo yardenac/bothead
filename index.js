@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+var colors = require('colors');
 var console = require('console');
 var irc = require('irc').Client;
 
@@ -75,20 +76,22 @@ client.addListener('raw', function (m) {
     else if (m.server) p = m.server;
     else p = '_';
     if (p === set.host) p= '@'; // hostname is clutter
-    s += p + ' ';
+    s += colors.green(p) + ' ';
 
+    var c = ''; // command string
     if (m.command && m.rawCommand && m.commandType) {
         if (ignored_commandtypes.indexOf(m.command) > -1) return;
         if (m.command === 'rpl_myinfo') set.host = m.args[1];
 
-        if (m.command === m.rawCommand) s += m.command;
-        else s += m.rawCommand + '/' + m.command;
+        if (m.command === m.rawCommand) c += m.command;
+        else c += m.rawCommand + '/' + m.command;
 
-        if (m.commandType === 'normal') s += ' ';
-        else if (m.commandType === 'error') s += '/e ';
-        else if (m.commandType === 'reply') s += '/r ';
-        else s += '/w '; // weird
-    } else s += '_ ';
+        if (m.commandType === 'normal') true;
+        else if (m.commandType === 'error') c += '/e';
+        else if (m.commandType === 'reply') c += '/r';
+        else c += '/w'; // weird
+    } else c = '_';
+    s += colors.cyan(c) + ' ';
 
     var u = ''; // user string
     if (m.nick) u += m.nick;
@@ -96,7 +99,7 @@ client.addListener('raw', function (m) {
     if (m.host) u += '@' + m.host;
 
     // don't repeat noise if prefix & user strings are the same
-    if (!(p === u)) s += u + ' ';
+    if (!(p === u)) s += colors.yellow(u) + ' ';
 
     for (var i = 0, len = m.args.length; i < len; ++i) {
         if (i) s += '|';
