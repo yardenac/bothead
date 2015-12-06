@@ -9,7 +9,8 @@ var argv = require('minimist')(process.argv.slice(2), {
     },
     default: {
         datadir: 'db',
-        dir: undefined
+        dir: undefined,
+        host: ''
     }
 });
 if (argv.dir === undefined) {
@@ -67,27 +68,28 @@ client.addListener('raw', function (m) {
     var p = ''; // prefix/server string
     if (m.prefix && m.server) {
         if (m.prefix === m.server) {
-            p += m.prefix + " ";
-        } else p += m.prefix + "/" + m.server;
-    } else if (m.prefix) p += m.prefix + ' ';
-    else if (m.server) p += m.server + ' ';
-    else p += '@ ';
-    s += p;
+            p = m.prefix;
+        } else p = m.prefix + "/" + m.server;
+    } else if (m.prefix) p = m.prefix;
+    else if (m.server) p = m.server;
+    else p = '_';
+    if (p === set.host) p= '@'; // hostname is clutter
+    s += p + ' ';
 
     if (m.command && m.rawCommand && m.commandType) {
         if (ignored_commandtypes.indexOf(m.command) > -1) return;
+        if (m.command === 'rpl_myinfo') set.host = m.args[1];
         if (m.command === m.rawCommand) s += m.command + ' ';
         else s += m.rawCommand + '/' + m.command + ' ' + m.commandType + ' ';
-    } else s += '@ ';
+    } else s += '_ ';
 
     var u = ''; // user string
     if (m.nick) u += m.nick;
     if (m.user) u += '!' + m.user;
     if (m.host) u += '@' + m.host;
-    u += ' ';
 
-    // don't repeat noise
-    if (!(p === u)) s += u;
+    // don't repeat noise if prefix & user strings are the same
+    if (!(p === u)) s += u + ' ';
 
     for (var i = 0, len = m.args.length; i < len; ++i) {
         if (i) s += '|';
