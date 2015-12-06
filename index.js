@@ -47,6 +47,7 @@ var client = new irc('chat.freenode.net', set.username, {
 
 client.addListener('error', err);
 var ignored_commandtypes = [
+    'PING',
     'rpl_created',
     'rpl_isupport',
     'rpl_luserclient',
@@ -79,8 +80,14 @@ client.addListener('raw', function (m) {
     if (m.command && m.rawCommand && m.commandType) {
         if (ignored_commandtypes.indexOf(m.command) > -1) return;
         if (m.command === 'rpl_myinfo') set.host = m.args[1];
-        if (m.command === m.rawCommand) s += m.command + ' ';
-        else s += m.rawCommand + '/' + m.command + ' ' + m.commandType + ' ';
+
+        if (m.command === m.rawCommand) s += m.command;
+        else s += m.rawCommand + '/' + m.command;
+
+        if (m.commandType === 'normal') s += ' ';
+        else if (m.commandType === 'error') s += '/e ';
+        else if (m.commandType === 'reply') s += '/r ';
+        else s += '/w '; // weird
     } else s += '_ ';
 
     var u = ''; // user string
