@@ -45,18 +45,18 @@ var client = new irc('chat.freenode.net', set.username, {
 });
 
 client.addListener('error', err);
-client.addListener('raw', function (message) {
+client.addListener('raw', function (m) {
     var fserver = /[a-z0-9]+\.freenode\.net$/i;
-    if (message.prefix && message.prefix.match(fserver)
-        && message.server.match(fserver)
-        && (message.commandType === 'normal')
-        && (message.args[0] === set.username)
-        && message.args[1].match(/^unaffiliated\//)
-        && (message.args[2] === 'is now your hidden host (set by services.)')) {
+    if (m.prefix && m.prefix.match(fserver)
+        && m.server.match(fserver)
+        && (m.commandType === 'normal')
+        && (m.args[0] === set.username)
+        && m.args[1].match(/^unaffiliated\//)
+        && (m.args[2] === 'is now your hidden host (set by services.)')) {
         client.join(set.channels);
     }
 });
-client.addListener('message', function (from, to, text, message) {
+client.addListener('message', function (from, to, text, m) {
     console.log(to + ' ' + from + ' ' + text);
     if (/^&quit/.test(text)) {
         client.disconnect(err);
