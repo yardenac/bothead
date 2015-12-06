@@ -56,9 +56,9 @@ client.addListener('raw', function (message) {
         client.join(set.channels);
     }
 });
-client.addListener('message', function (from, to, message) {
-    console.log(to + ' ' + from + ' ' + message);
-    if (/^&quit/.test(message)) {
+client.addListener('message', function (from, to, text, message) {
+    console.log(to + ' ' + from + ' ' + text);
+    if (/^&quit/.test(text)) {
         client.disconnect(err);
         process.exit();
     }
