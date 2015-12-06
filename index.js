@@ -46,6 +46,38 @@ var client = new irc('chat.freenode.net', set.username, {
 
 client.addListener('error', err);
 client.addListener('raw', function (m) {
+    var s = ''; // string we'll build & print to console
+
+    var p = ''; // prefix/server string
+    if (m.prefix && m.server) {
+        if (m.prefix === m.server) {
+            p += m.prefix + " ";
+        } else p += m.prefix + "/" + m.server;
+    } else if (m.prefix) p += m.prefix + ' ';
+    else if (m.server) p += m.server + ' ';
+    else p += '@ ';
+    s += p;
+
+    if (m.command && m.rawCommand && m.commandType) {
+        if (m.command === m.rawCommand) s += m.command + ' ';
+        else s += m.rawCommand + '/' + m.command + ' ' + m.commandType + ' ';
+    } else s += '@ ';
+
+    var u = ''; // user string
+    if (m.nick) u += m.nick;
+    if (m.user) u += '!' + m.user;
+    if (m.host) u += '@' + m.host;
+    u += ' ';
+
+    // don't repeat noise
+    if (!(p === u)) s += u;
+
+    for (var i = 0, len = m.args.length; i < len; ++i) {
+        if (i) s += '|';
+        s += m.args[i];
+    }
+    console.log(s);
+
     var fserver = /[a-z0-9]+\.freenode\.net$/i;
     if (m.prefix && m.prefix.match(fserver)
         && m.server.match(fserver)
