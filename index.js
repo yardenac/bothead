@@ -116,11 +116,15 @@ client.addListener('raw', function (m) {
         && (m.args[2] === 'is now your hidden host (set by services.)')) {
         client.join(set.channels);
     }
-});
-client.addListener('message', function (from, to, text, m) {
-    console.log(to + ' ' + from + ' ' + text);
-    if (/^&quit/.test(text)) {
-        client.disconnect(err);
-        process.exit();
+
+    if (m.command === 'PRIVMSG') {
+
+        // parse commands from authorized users
+        if (m.host && (set.ops.indexOf(m.host) > -1)) {
+            if (/^!bhquit/.test(m.args[1])) {
+                client.disconnect(err);
+                process.exit();
+            }
+        }
     }
 });
