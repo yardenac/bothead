@@ -45,6 +45,22 @@ var client = new irc('chat.freenode.net', set.username, {
 });
 
 client.addListener('error', err);
+var ignored_commandtypes = [
+    'rpl_created',
+    'rpl_isupport',
+    'rpl_luserclient',
+    'rpl_luserop',
+    'rpl_luserunknown',
+    'rpl_luserchannels',
+    'rpl_luserme',
+    'rpl_localusers',
+    'rpl_globalusers',
+    'rpl_statsconn',
+    'rpl_motdstart',
+    'rpl_motd',
+    'rpl_endofmotd',
+    'rpl_creationtime'
+];
 client.addListener('raw', function (m) {
     var s = ''; // string we'll build & print to console
 
@@ -59,6 +75,7 @@ client.addListener('raw', function (m) {
     s += p;
 
     if (m.command && m.rawCommand && m.commandType) {
+        if (ignored_commandtypes.indexOf(m.command) > -1) return;
         if (m.command === m.rawCommand) s += m.command + ' ';
         else s += m.rawCommand + '/' + m.command + ' ' + m.commandType + ' ';
     } else s += '@ ';
