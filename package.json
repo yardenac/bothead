@@ -1,0 +1,13 @@
+{
+    "name": "bothead",
+    "version": "0.0.0",
+    "license": "GPL",
+    "description": "homicidal lesbian terrorist irc bot",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yardenac/bothead.git"
+    },
+    "dependencies": {
+        "irc": "^0.4.0"
+    }
+}
