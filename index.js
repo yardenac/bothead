@@ -124,7 +124,7 @@ client.addListener('raw', function (m) {
 
         // parse commands from authorized users
         if (m.host && (set.ops.indexOf(m.host) > -1)) {
-            if (/^!bhquit/.test(m.args[1])) {
+            if (/^!bq/.test(m.args[1])) {
                 client.disconnect(err);
                 process.exit();
             }
