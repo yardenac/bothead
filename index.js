@@ -132,5 +132,7 @@ client.addListener('raw', function (m) {
     }
 });
 client.addListener('send', function (s) {
-    console.log(colors.yellow(s));
+    if (!s.match(/^PONG/)) {
+        console.log(colors.yellow(s));
+    };
 });
