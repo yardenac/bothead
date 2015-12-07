@@ -68,8 +68,24 @@ var ignored_commandtypes = [
     'rpl_myinfo',
     'rpl_topic',
     'rpl_topicwhotime',
-    'rpl_endofnames'
+    'rpl_endofnames',
+    'rpl_whoisuser',
+    'rpl_whoischannels',
+    'rpl_whoisserver',
+    'rpl_whoisidle',
+    '330',
+    '378',
+    '671',
+    'rpl_endofwhois',
+    'rpl_namreply'
 ];
+var ignored_sendtypes = [
+    'PONG',
+    'WHOIS'
+];
+function parseName(channel, whois) {
+    console.log(colors.yellow('PARSING NAME: ' + channel + ' ' + whois.nick + '!' + whois.user + '@' + whois.host + ' (' + whois.realname + ')'));
+};
 client.addListener('raw', function (m) {
     var s = ''; // string we'll build & print to console
 
@@ -87,6 +103,12 @@ client.addListener('raw', function (m) {
     var c = ''; // command string
     if (m.command && m.rawCommand && m.commandType) {
         if (m.command === 'rpl_myinfo') set.host = m.args[1];
+        if (m.command === 'rpl_namreply')
+            m.args[3].split(' ').forEach(function(nick) {
+                client.whois(/^[@+]?(.*)$/.exec(nick)[1], function(whois) {
+                    parseName(m.args[2], whois);
+                });
+            });
         if (ignored_commandtypes.indexOf(m.command) > -1) return;
 
         if (m.command === m.rawCommand) c += m.command;
@@ -137,7 +159,8 @@ client.addListener('raw', function (m) {
     }
 });
 client.addListener('send', function (s) {
-    if (!s.match(/^PONG/)) {
+    var cmd = /^([^ ]+)/.exec(s);
+    if (cmd && cmd[1] && (ignored_sendtypes.indexOf(cmd[1]) < 0)) {
         console.log(colors.yellow(s));
     };
 });
