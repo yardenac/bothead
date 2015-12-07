@@ -83,8 +83,8 @@ client.addListener('raw', function (m) {
 
     var c = ''; // command string
     if (m.command && m.rawCommand && m.commandType) {
-        if (ignored_commandtypes.indexOf(m.command) > -1) return;
         if (m.command === 'rpl_myinfo') set.host = m.args[1];
+        if (ignored_commandtypes.indexOf(m.command) > -1) return;
 
         if (m.command === m.rawCommand) c += m.command;
         else c += m.rawCommand + '/' + m.command;
