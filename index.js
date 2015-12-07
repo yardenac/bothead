@@ -8,6 +8,7 @@ var argv = require('minimist')(process.argv.slice(2), {
     alias: {
         D: 'dir'
     },
+    boolean: ['debug'],
     default: {
         datadir: 'db',
         dir: undefined,
@@ -23,14 +24,13 @@ if (argv.dir === undefined) {
 var err = function(message) {
     console.log('error: ', message);
 };
-
 var client = new irc('chat.freenode.net', set.username, {
     nick: set.username,
     userName: set.username,
     realName: set.username,
     password: set.password,
     port: 7000,
-    debug: true,
+    debug: argv.debug,
     showErrors: true,
     autoRejoin: false,
     autoConnect: true,
