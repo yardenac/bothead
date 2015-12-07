@@ -117,7 +117,9 @@ client.addListener('raw', function (m) {
         && (m.args[0] === set.username)
         && m.args[1].match(/^unaffiliated\//)
         && (m.args[2] === 'is now your hidden host (set by services.)')) {
-        client.join(set.channels);
+        set.channels.forEach(function(channel) {
+            client.join(channel);
+        });
     }
 
     if (m.command === 'PRIVMSG') {
