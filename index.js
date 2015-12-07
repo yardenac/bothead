@@ -77,7 +77,8 @@ var ignored_commandtypes = [
     '378',
     '671',
     'rpl_endofwhois',
-    'rpl_namreply'
+    'rpl_namreply',
+    'rpl_away'
 ];
 var ignored_sendtypes = [
     'PONG',
