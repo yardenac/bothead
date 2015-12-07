@@ -46,6 +46,7 @@ var client = new irc('chat.freenode.net', set.username, {
     encoding: ''
 });
 
+client._maxListeners = 30;
 client.addListener('error', err);
 var ignored_commandtypes = [
     'PING',
@@ -86,6 +87,7 @@ var ignored_sendtypes = [
 ];
 function parseName(channel, whois) {
     console.log(colors.yellow('PARSING NAME: ' + channel + ' ' + whois.nick + '!' + whois.user + '@' + whois.host + ' (' + whois.realname + ')'));
+    client._maxListeners--;
 };
 client.addListener('raw', function (m) {
     var s = ''; // string we'll build & print to console
@@ -106,6 +108,7 @@ client.addListener('raw', function (m) {
         if (m.command === 'rpl_myinfo') set.host = m.args[1];
         if (m.command === 'rpl_namreply')
             m.args[3].split(' ').forEach(function(nick) {
+                client._maxListeners++;
                 client.whois(/^[@+]?(.*)$/.exec(nick)[1], function(whois) {
                     parseName(m.args[2], whois);
                 });
