@@ -1,6 +1,9 @@
 module.exports = {
     username: 'user',
     password: 'password',
-    channels: ['#channel1', '#channel2'],
-    ops: ['unaffiliated/you', 'unaffiliated/yourmom']
+    channels: ['#channel1',{
+        name: '#channel2',
+        opchannel: '#channel2-ops',
+        ops: ['unaffiliated/you', 'unaffiliated/yourmom']
+    }]
 };
