@@ -150,17 +150,6 @@ client.addListener('raw', function (m) {
             client.join(channel);
         });
     }
-
-    if (m.command === 'PRIVMSG') {
-
-        // parse commands from authorized users
-        if (m.host && (set.ops.indexOf(m.host) > -1)) {
-            if (/^!bq/.test(m.args[1])) {
-                client.disconnect(err);
-                process.exit();
-            }
-        }
-    }
 });
 client.addListener('send', function (s) {
     var cmd = /^([^ ]+)/.exec(s);
