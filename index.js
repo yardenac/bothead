@@ -91,9 +91,29 @@ var ignored_sendtypes = [
     'PONG',
     'WHOIS'
 ];
-function parseName(channel, whois) {
-    console.log(colors.yellow('PARSING NAME: ' + channel + ' ' + whois.nick + '!' + whois.user + '@' + whois.host + ' (' + whois.realname + ')'));
+function isString(v) {
+    return (typeof v === 'string' || v instanceof String);
+};
+function parseUser(user) {
+
+    // fill in blanks
+    var p = ['channel','nick','username','hostname','realname'];
+    var l = p.length;
+    for (var i = 0; i < l; i++)
+        if (!user[p[i]] || !isString(user[p[i]]))
+            user[p[i]] = '';
+
+    console.log(colors.yellow('PARSING NAME: ' + user.channel + ' ' + user.nick + '!' + user.username + '@' + user.hostname + ' (' + user.realname + ')'));
+};
+function parseWhois(channel, whois) {
     client._maxListeners--;
+    parseUser({
+        channel: channel,
+        nick: whois.nick,
+        username: whois.user,
+        hostname: whois.host,
+        realname: whois.realname
+    });
 };
 client.addListener('raw', function (m) {
     var s = ''; // string we'll build & print to console
@@ -116,7 +136,7 @@ client.addListener('raw', function (m) {
             m.args[3].split(' ').forEach(function(nick) {
                 client._maxListeners++;
                 client.whois(/^[@+]?(.*)$/.exec(nick)[1], function(whois) {
-                    parseName(m.args[2], whois);
+                    parseWhois(m.args[2], whois);
                 });
             });
         if (ignored_commandtypes.indexOf(m.command) > -1) return;
@@ -153,8 +173,8 @@ client.addListener('raw', function (m) {
         && m.args[1].match(/^unaffiliated\//)
         && (m.args[2] === 'is now your hidden host (set by services.)')) {
         set.channels.forEach(function(channel) {
-            if (typeof channel === 'string' || channel instanceof String)
-                client.join(channel);
+            if (isString(channel))
+                client.join(channel)
             else {
                 client.join(channel.name);
                 client.join(channel.opchannel);
