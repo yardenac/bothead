@@ -168,3 +168,19 @@ client.addListener('send', function (s) {
         console.log(colors.yellow(s));
     };
 });
+
+// close connection properly on ctrl-c, etc
+['SIGABRT',
+ 'SIGCONT',
+ 'SIGEXIT',
+ 'SIGHUP',
+ 'SIGINT',
+ 'SIGTERM',
+ 'SIGTSTP',
+ 'SIGQUIT'].forEach(function(sig) {
+    process.on(sig, function() {
+        console.log('Got signal: ' + sig);
+        client.disconnect(err);
+        process.exit();
+    });
+});
