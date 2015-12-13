@@ -21,6 +21,12 @@ if (argv.dir === undefined) {
     var set = require(argv.dir + '/settings.js');
 };
 
+var db = {
+    nicks: require('path').join(argv.dir, argv.datadir, 'nicks')
+};
+require('mkdirp').sync(db.nicks);
+db.nicks = require('level')(db.nicks);
+
 var err = function(message) {
     console.log('error: ', message);
 };

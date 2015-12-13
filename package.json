@@ -10,6 +10,7 @@
     "dependencies": {
         "colors": "^1.1.2",
         "irc": "^0.4.0",
+        "level": "^1.4.0",
         "minimist": "^1.2.0"
     }
 }
