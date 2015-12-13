@@ -104,6 +104,10 @@ function parseUser(user) {
             user[p[i]] = '';
 
     console.log(colors.yellow('PARSING NAME: ' + user.channel + ' ' + user.nick + '!' + user.username + '@' + user.hostname + ' (' + user.realname + ')'));
+
+    // if anything's missing this should call whois
+    // or maybe there should be a lastWhois timestamp
+    // when should it add to the database?
 };
 function parseWhois(channel, whois) {
     client._maxListeners--;
@@ -181,6 +185,21 @@ client.addListener('raw', function (m) {
             };
         });
     }
+
+    if ((m.command === 'JOIN') || (m.command === 'QUIT')) {
+        parseUser({
+            channel: m.args[0],
+            nick: m.nick,
+            username: m.user,
+            hostname: m.host
+        });
+    } else if (m.command === 'NICK') {
+        parseUser({
+            nick: m.args[0],
+            username: m.user,
+            hostname: m.host
+        });
+    };
 });
 client.addListener('send', function (s) {
     var cmd = /^([^ ]+)/.exec(s);
