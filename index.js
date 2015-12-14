@@ -2,6 +2,7 @@
 
 var colors = require('colors');
 var console = require('console');
+var f = require(__dirname + '/lib/funcs.js');
 var irc = require('irc').Client;
 var jss = require('json-stable-stringify');
 var xtend = require('xtend');
@@ -230,6 +231,11 @@ client.addListener('send', function (s) {
     };
 });
 
+// print database contents on ctrl-z
+process.on('SIGTSTP',function() {
+    f.dbdump(db.nicks);
+});
+
 // close connection properly on ctrl-c, etc
 ['SIGABRT',
  'SIGCONT',
@@ -237,7 +243,6 @@ client.addListener('send', function (s) {
  'SIGHUP',
  'SIGINT',
  'SIGTERM',
- 'SIGTSTP',
  'SIGQUIT'].forEach(function(sig) {
     process.on(sig, function() {
         console.log('Got signal: ' + sig);
