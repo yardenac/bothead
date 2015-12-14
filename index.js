@@ -3,6 +3,8 @@
 var colors = require('colors');
 var console = require('console');
 var irc = require('irc').Client;
+var jss = require('json-stable-stringify');
+var xtend = require('xtend');
 
 var argv = require('minimist')(process.argv.slice(2), {
     alias: {
@@ -30,6 +32,23 @@ db.nicks = require('level')(db.nicks);
 var err = function(message) {
     console.log('error: ', message);
 };
+db.nicks.merge = function(key, obj) {
+    // it's a db of json strings, ~sql, this merges them
+    var self = this;
+    this.get(key,function(err,oldval) {
+        if (err) {
+            if (err.name == 'NotFoundError') {
+                self.put(key,jss(obj));
+                console.log('new: ' + jss(obj));
+            } else console.error('weird db err: ' + err);
+        } else {
+            var newobj = xtend(JSON.parse(oldval),obj);
+            self.put(key,jss(newobj));
+            console.log('changed: ' + jss(newobj));
+        };
+    });
+};
+
 var client = new irc('chat.freenode.net', set.username, {
     nick: set.username,
     userName: set.username,
@@ -105,9 +124,12 @@ function parseUser(user) {
 
     console.log(colors.yellow('PARSING NAME: ' + user.channel + ' ' + user.nick + '!' + user.username + '@' + user.hostname + ' (' + user.realname + ')'));
 
+    delete user.channel;
+
+    return db.nicks.merge(user.nick, user);
+
     // if anything's missing this should call whois
     // or maybe there should be a lastWhois timestamp
-    // when should it add to the database?
 };
 function parseWhois(channel, whois) {
     client._maxListeners--;
