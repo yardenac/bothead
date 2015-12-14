@@ -3,8 +3,6 @@
 var colors = require('colors');
 var console = require('console');
 var irc = require('irc').Client;
-var jss = require('json-stable-stringify');
-var xtend = require('xtend');
 
 var argv = require('minimist')(process.argv.slice(2), {
     alias: {
@@ -31,22 +29,6 @@ db.nicks = require(__dirname + '/lib/db.js')(db.nicks);
 
 var err = function(message) {
     console.log('error: ', message);
-};
-db.nicks.merge = function(key, obj) {
-    // it's a db of json strings, ~sql, this merges them
-    var self = this;
-    this.get(key,function(err,oldval) {
-        if (err) {
-            if (err.name == 'NotFoundError') {
-                self.put(key,jss(obj));
-                console.log('new: ' + jss(obj));
-            } else console.error('weird db err: ' + err);
-        } else {
-            var newobj = xtend(JSON.parse(oldval),obj);
-            self.put(key,jss(newobj));
-            console.log('changed: ' + jss(newobj));
-        };
-    });
 };
 
 var client = new irc('chat.freenode.net', set.username, {
