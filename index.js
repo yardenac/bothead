@@ -2,7 +2,6 @@
 
 var colors = require('colors');
 var console = require('console');
-var f = require(__dirname + '/lib/funcs.js');
 var irc = require('irc').Client;
 var jss = require('json-stable-stringify');
 var xtend = require('xtend');
@@ -28,7 +27,7 @@ var db = {
     nicks: require('path').join(argv.dir, argv.datadir, 'nicks')
 };
 require('mkdirp').sync(db.nicks);
-db.nicks = require('level')(db.nicks);
+db.nicks = require(__dirname + '/lib/db.js')(db.nicks);
 
 var err = function(message) {
     console.log('error: ', message);
@@ -233,7 +232,7 @@ client.addListener('send', function (s) {
 
 // print database contents on ctrl-z
 process.on('SIGTSTP',function() {
-    f.dbdump(db.nicks);
+    db.nicks.dump();
 });
 
 // close connection properly on ctrl-c, etc
