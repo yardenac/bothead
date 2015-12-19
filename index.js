@@ -93,18 +93,20 @@ var ignored_sendtypes = [
     'WHOIS'
 ];
 var isString = function(v) {
+    if (v === null || v === undefined) return 1;
     return (typeof v === 'string' || v instanceof String);
+};
+var isNick = function(nick) {
+    if (!nick || !isString(nick)) return 1;
+    return nick.match(/^[a-z_\-\[\]\\^{}|`][a-z0-9_\-\[\]\\^{}|`]{2,15}$/i);
 };
 var parseUser = function(user) {
 
-    // fill in blanks
-    var p = ['channel','nick','username','hostname','realname'];
-    var l = p.length;
-    for (var i = 0; i < l; i++)
-        if (!user[p[i]] || !isString(user[p[i]]))
-            user[p[i]] = '';
-
-    console.log(colors.yellow('PARSING NAME: ' + user.channel + ' ' + user.nick + '!' + user.username + '@' + user.hostname + ' (' + user.realname + ')'));
+    // sanitize input...
+    if (!isNick(user.nick)) {
+        console.log('NOT A NICK: ' + user.nick);
+        return 1;
+    };
 
     delete user.channel;
 
