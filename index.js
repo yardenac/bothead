@@ -139,14 +139,36 @@ client.addListener('raw', function (m) {
 
     var c = ''; // command string
     if (m.command && m.rawCommand && m.commandType) {
-        if (m.command === 'rpl_myinfo') set.host = m.args[1];
-        if (m.command === 'rpl_namreply')
+        switch(m.command) {
+        case 'rpl_myinfo':
+            set.host = m.args[1];
+            break;
+        case 'rpl_namreply':
             m.args[3].split(' ').forEach(function(nick) {
                 client._maxListeners++;
                 client.whois(/^[@+]?(.*)$/.exec(nick)[1], function(whois) {
                     parseWhois(m.args[2], whois);
                 });
             });
+            break;
+        case 'JOIN':
+        case 'QUIT':
+            parseUser({
+                channel: m.args[0],
+                nick: m.nick,
+                username: m.user,
+                hostname: m.host
+            });
+            break;
+        case 'NICK':
+            parseUser({
+                nick: m.args[0],
+                username: m.user,
+                hostname: m.host
+            });
+            break;
+        }
+
         if (ignored_commandtypes.indexOf(m.command) > -1) return;
 
         if (m.command === m.rawCommand) c += m.command;
@@ -189,21 +211,6 @@ client.addListener('raw', function (m) {
             };
         });
     }
-
-    if ((m.command === 'JOIN') || (m.command === 'QUIT')) {
-        parseUser({
-            channel: m.args[0],
-            nick: m.nick,
-            username: m.user,
-            hostname: m.host
-        });
-    } else if (m.command === 'NICK') {
-        parseUser({
-            nick: m.args[0],
-            username: m.user,
-            hostname: m.host
-        });
-    };
 });
 client.addListener('send', function (s) {
     var cmd = /^([^ ]+)/.exec(s);
