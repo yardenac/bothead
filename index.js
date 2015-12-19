@@ -92,10 +92,10 @@ var ignored_sendtypes = [
     'PONG',
     'WHOIS'
 ];
-function isString(v) {
+var isString = function(v) {
     return (typeof v === 'string' || v instanceof String);
 };
-function parseUser(user) {
+var parseUser = function(user) {
 
     // fill in blanks
     var p = ['channel','nick','username','hostname','realname'];
@@ -113,7 +113,7 @@ function parseUser(user) {
     // if anything's missing this should call whois
     // or maybe there should be a lastWhois timestamp
 };
-function parseWhois(channel, whois) {
+var parseWhois = function(channel, whois) {
     client._maxListeners--;
     parseUser({
         channel: channel,
