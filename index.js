@@ -169,7 +169,25 @@ client.addListener('raw', function (m) {
                 hostname: m.host
             });
             break;
-        }
+        case '396':
+            var fserver = /[a-z0-9]+\.freenode\.net$/i;
+            if (m.prefix && m.prefix.match(fserver)
+                && m.server.match(fserver)
+                && (m.commandType === 'normal')
+                && (m.args[0] === set.username)
+                && m.args[1].match(/^unaffiliated\//)
+                && (m.args[2] === 'is now your hidden host (set by services.)')) {
+                set.channels.forEach(function(channel) {
+                    if (isString(channel))
+                        client.join(channel)
+                    else {
+                        client.join(channel.name);
+                        client.join(channel.opchannel);
+                    };
+                });
+            };
+            break;
+        };
 
         if (ignored_commandtypes.indexOf(m.command) > -1) return;
 
@@ -196,23 +214,6 @@ client.addListener('raw', function (m) {
         s += m.args[i];
     }
     console.log(s);
-
-    var fserver = /[a-z0-9]+\.freenode\.net$/i;
-    if (m.prefix && m.prefix.match(fserver)
-        && m.server.match(fserver)
-        && (m.commandType === 'normal')
-        && (m.args[0] === set.username)
-        && m.args[1].match(/^unaffiliated\//)
-        && (m.args[2] === 'is now your hidden host (set by services.)')) {
-        set.channels.forEach(function(channel) {
-            if (isString(channel))
-                client.join(channel)
-            else {
-                client.join(channel.name);
-                client.join(channel.opchannel);
-            };
-        });
-    }
 });
 client.addListener('send', function (s) {
     var cmd = /^([^ ]+)/.exec(s);
