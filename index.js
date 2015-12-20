@@ -115,16 +115,6 @@ var parseUser = function(user) {
     // if anything's missing this should call whois
     // or maybe there should be a lastWhois timestamp
 };
-var parseWhois = function(channel, whois) {
-    client._maxListeners--;
-    parseUser({
-        channel: channel,
-        nick: whois.nick,
-        username: whois.user,
-        hostname: whois.host,
-        realname: whois.realname
-    });
-};
 client.addListener('raw', function (m) {
     var s = ''; // string we'll build & print to console
 
@@ -149,7 +139,14 @@ client.addListener('raw', function (m) {
             m.args[3].split(' ').forEach(function(nick) {
                 client._maxListeners++;
                 client.whois(/^[@+]?(.*)$/.exec(nick)[1], function(whois) {
-                    parseWhois(m.args[2], whois);
+                    client._maxListeners--;
+                    parseUser({
+                        channel: m.args[2],
+                        nick: whois.nick,
+                        username: whois.user,
+                        hostname: whois.host,
+                        realname: whois.realname
+                    });
                 });
             });
             break;
