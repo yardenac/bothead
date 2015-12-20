@@ -100,6 +100,13 @@ var isNick = function(nick) {
     if (!nick || !isString(nick)) return 0;
     return nick.match(/^[a-z_\-\[\]\\^{}|`][a-z0-9_\-\[\]\\^{}|`]{2,15}$/i);
 };
+var endswith = function(v, end) {
+    // does the string 'v' end with the string 'end'?
+    if (!v || !end || !isString(v) || !isString(end)) return 0;
+    var start = v.length - end.length;
+    if (start < 0) return 0;
+    return (v.substring(0,start) === end);
+};
 var parseUser = function(user) {
 
     // sanitize input...
@@ -190,6 +197,8 @@ client.addListener('raw', function (m) {
                         nick: words[2],
                         accountname: lastword.substring(0, lastword.length - 2)
                     });
+                    return;
+                } else if (endswith(m.args[1],' has enabled nick protection')) {
                     return;
                 } else
                     switch(m.args[1].substring(0,13)) {
