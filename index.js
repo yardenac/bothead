@@ -110,6 +110,11 @@ var parseUser = function(user) {
 
     delete user.channel;
 
+    // ask nickserv about it, but not more than daily
+    db.nicks.stamp(user.nick, 'lastns', 86400000, function() {
+        client.say('nickserv','info ' + user.nick + ' all');
+    });
+
     return db.nicks.merge(user.nick, user);
 
     // if anything's missing this should call whois
@@ -166,6 +171,41 @@ client.addListener('raw', function (m) {
                 hostname: m.host
             });
             break;
+        case 'PRIVMSG':
+            // all nickserv messages are duplicated as notices
+            if (m.nick === 'NickServ'
+                && m.user === 'NickServ'
+                && m.host === 'services.') {
+                return;
+            };
+            break;
+        case 'NOTICE':
+            if (m.nick === 'NickServ'
+                && m.user === 'NickServ'
+                && m.host === 'services.') {
+                if (m.args[1].match(/^Information on [a-z0-9_\-\[\]\\^{}|`]+ \(account /)) {
+                    var words = m.args[1].split(' ');
+                    var lastword = words[words.length - 1];
+                    setTimeout(parseUser,0,{
+                        nick: words[2],
+                        accountname: lastword.substring(0, lastword.length - 2)
+                    });
+                    return;
+                } else
+                    switch(m.args[1].substring(0,13)) {
+                    case 'Registered : ':
+                    case 'User reg.  : ':
+                    case 'Last addr  : ':
+                    case 'vHost      : ':
+                    case 'Last seen  : ':
+                    case 'Logins from: ':
+                    case 'Nicks      : ':
+                    case 'Email      : ':
+                    case 'Flags      : ':
+                    case '*** End of In':
+                        return;
+                    };
+            };
         case '396':
             var fserver = /[a-z0-9]+\.freenode\.net$/i;
             if (m.prefix && m.prefix.match(fserver)
