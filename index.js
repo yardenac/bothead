@@ -119,7 +119,7 @@ var parseUser = function(u) {
         return false;
     };
 
-    delete user.channel;
+    delete u.channel;
 
     // ask nickserv about it, but not more than daily
     db.nicks.stamp(u.nick, 'lastns', 86400000, function() {
@@ -160,7 +160,7 @@ client.addListener('raw', function (m) {
                         channel: m.args[2],
                         nick: whois.nick,
                         username: whois.user,
-                        hostname: whois.host,
+                        host: whois.host,
                         realname: whois.realname
                     });
                 });
@@ -172,14 +172,14 @@ client.addListener('raw', function (m) {
                 channel: m.args[0],
                 nick: m.nick,
                 username: m.user,
-                hostname: m.host
+                host: m.host
             });
             break;
         case 'NICK':
             parseUser({
                 nick: m.args[0],
                 username: m.user,
-                hostname: m.host
+                host: m.host
             });
             break;
         case 'PRIVMSG':
