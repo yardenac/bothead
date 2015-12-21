@@ -107,22 +107,22 @@ var endswith = function(v, end) {
     if (start < 0) return 0;
     return (v.substring(0,start) === end);
 };
-var parseUser = function(user) {
+var parseUser = function(u) {
 
     // sanitize input...
-    if (!isNick(user.nick)) {
-        console.log('NOT A NICK: ' + user.nick);
+    if (!isNick(u.nick)) {
+        console.log('NOT A NICK: ' + u.nick);
         return 0;
     };
 
     delete user.channel;
 
     // ask nickserv about it, but not more than daily
-    db.nicks.stamp(user.nick, 'lastns', 86400000, function() {
-        client.say('nickserv','info ' + user.nick + ' all');
+    db.nicks.stamp(u.nick, 'lastns', 86400000, function() {
+        client.say('nickserv','info ' + u.nick + ' all');
     });
 
-    return db.nicks.merge(user.nick, user);
+    return db.nicks.merge(u.nick, u);
 
     // if anything's missing this should call whois
     // or maybe there should be a lastWhois timestamp
