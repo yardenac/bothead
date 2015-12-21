@@ -96,9 +96,13 @@ var isString = function(v) {
     if (v === null || v === undefined) return false;
     return (typeof v === 'string' || v instanceof String);
 };
-var isNick = function(nick) {
+var safeNick = function(nick) {
+    // if it's not a nick, return false
+    // if it is, return the nick (with @ or + stripped)
     if (!nick || !isString(nick)) return false;
-    return nick.match(/^[a-z_\-\[\]\\^{}|`][a-z0-9_\-\[\]\\^{}|`]{2,15}$/i);
+    var match = nick.match(/^[@+]?([a-z_\-\[\]\\^{}|`][a-z0-9_\-\[\]\\^{}|`]{2,15})$/i);
+    if (match === null) return false;
+    return match[1];
 };
 var endswith = function(v, end) {
     // does the string 'v' end with the string 'end'?
@@ -110,7 +114,7 @@ var endswith = function(v, end) {
 var parseUser = function(u) {
 
     // sanitize input...
-    if (!isNick(u.nick)) {
+    if (!(u.nick = safeNick(u.nick))) {
         console.log('NOT A NICK: ' + u.nick);
         return false;
     };
