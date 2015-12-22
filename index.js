@@ -153,8 +153,9 @@ client.addListener('raw', function (m) {
             break;
         case 'rpl_namreply':
             m.args[3].split(' ').forEach(function(nick) {
+                if (!(nick = safeNick(nick))) return false;
                 client._maxListeners++;
-                client.whois(/^[@+]?(.*)$/.exec(nick)[1], function(whois) {
+                client.whois(nick, function(whois) {
                     client._maxListeners--;
                     parseUser({
                         channel: m.args[2],
