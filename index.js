@@ -119,6 +119,12 @@ var parseUser = function(u) {
         return false;
     };
 
+    if (!u.host || !isString(u.host)) {
+        // weird. whois doesn't even go here. untrustworthy info
+        console.log(colors.red('no host???' + jss(u)));
+        return false;
+    };
+
     delete u.channel;
 
     // ask nickserv about it, but not more than daily
@@ -127,9 +133,6 @@ var parseUser = function(u) {
     });
 
     return db.nicks.merge(u.nick, u);
-
-    // if anything's missing this should call whois
-    // or maybe there should be a lastWhois timestamp
 };
 client.addListener('raw', function (m) {
     var s = ''; // string we'll build & print to console
