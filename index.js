@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// must be run from this file only! no weirdness
+if ((require.main !== module)
+    || (require.main.filename != __filename)) process.exit();
+
 var colors = require('colors');
 var console = require('console');
 var irc = require('irc').Client;
